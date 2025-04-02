@@ -14,7 +14,6 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
-        // По умолчанию показываем экран логина
         supportFragmentManager.beginTransaction()
             .replace(R.id.authFragmentContainer, LoginFragment())
             .commit()

@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <!-- Картинка/логотип над формой -->
         <ImageView
             android:id="@+id/imageLogo"
             android:layout_width="165dp"

@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_put -> viewPager.currentItem = 2
                 R.id.nav_delete -> viewPager.currentItem = 3
                 R.id.nav_logout -> {
-                    // Вызываем logout и переходим на AuthActivity
                     CoroutineScope(Dispatchers.IO).launch {
                         logout()
                         val sessionManager = SessionManager(this@MainActivity)
