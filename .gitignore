@@ -1,0 +1,86 @@
+# Kotlin
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.log
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store
+Thumbs.db
+
+# IntelliJ IDEA #
+#################
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+gen/
+
+# Gradle #
+##########
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin DSL specific files #
+.kts/
+buildSrc/.gradle/
+buildSrc/build/
+
+# Android Studio (если ты разрабатываешь под Android) #
+########################################################
+captures/
+.externalNativeBuild
+.cxx
+local.properties
+*.keystore
+*.jks
+
+# VS Code (если используешь) #
+##############################
+.vscode/
+
+# JetBrains Rider #
+###################
+.idea/
+*.sln
+*.csproj
+*.user
+*.suo
+*.cache
+
+# Others #
+##########
+*.swp
+*.swo
+*~

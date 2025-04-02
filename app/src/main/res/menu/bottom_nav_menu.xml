@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_get"
+        android:icon="@drawable/ic_get"
+        android:title="Получить" />
+
+    <item
+        android:id="@+id/nav_post"
+        android:icon="@drawable/ic_post"
+        android:title="Добавить" />
+
+    <item
+        android:id="@+id/nav_put"
+        android:icon="@drawable/ic_put"
+        android:title="Обновить" />
+
+    <item
+        android:id="@+id/nav_delete"
+        android:icon="@drawable/ic_delete"
+        android:title="Удалить" />
+
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Выход" />
+</menu>

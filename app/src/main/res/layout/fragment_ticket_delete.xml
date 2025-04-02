@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_blue"
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/editId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID билета для удаления"
+            android:inputType="number"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/darker_gray"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Удалить билет"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>

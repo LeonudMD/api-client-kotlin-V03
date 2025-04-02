@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/dark_blue_darker"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Картинка/логотип над формой -->
+        <ImageView
+            android:id="@+id/imageLogo"
+            android:layout_width="165dp"
+            android:layout_height="152dp"
+            android:layout_marginBottom="50dp"
+            android:contentDescription="@string/app_name"
+            android:src="@mipmap/ic_launcher_foreground" />
+
+        <EditText
+            android:id="@+id/editUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Имя пользователя"
+            android:textColorHint="@android:color/darker_gray"
+            android:textColor="@android:color/white" />
+
+        <EditText
+            android:id="@+id/editEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:textColorHint="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="8dp" />
+
+        <EditText
+            android:id="@+id/editPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:textColorHint="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegisterSubmit"
+            android:layout_width="271dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Зарегистрироваться" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBackToLogin"
+            android:layout_width="186dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/ic_launcher_background"
+            android:text="Вернуться к авторизации" />
+
+    </LinearLayout>
+</ScrollView>
