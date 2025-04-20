@@ -2,8 +2,13 @@ package com.api_client_kotlin_v0.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Ticket(
-    val id: Int,
+data class RegisterRequest(val username: String, val email: String, val password: String)
+
+@Serializable
+data class LoginRequest(val email: String, val password: String)
+
+@Serializable
+data class TicketRequest(
     val name: String,
     val location: String,
     val date: String,

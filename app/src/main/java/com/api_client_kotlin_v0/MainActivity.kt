@@ -3,6 +3,7 @@ package com.api_client_kotlin_v0
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.api_client_kotlin_v0.ApiClient.logout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -31,15 +32,17 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_put -> viewPager.currentItem = 2
                 R.id.nav_delete -> viewPager.currentItem = 3
                 R.id.nav_logout -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        logout()
-                        val sessionManager = SessionManager(this@MainActivity)
-                        sessionManager.clearTokens()
-                        runOnUiThread {
-                            val intent = Intent(this@MainActivity, AuthActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            startActivity(intent)
-                        }
+                    // Запускаем корутину в scope самой Activity
+                    lifecycleScope.launch {
+                        // Опционально: уведомляем сервер о логауте
+                        try { ApiClient.logout() } catch (_: Exception) { /* игнор */ }
+                        // Чистим токены
+                        SessionManager(this@MainActivity).clearTokens()
+                        // Переходим на AuthActivity и завершаем MainActivity
+                        Intent(this@MainActivity, AuthActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }.also { startActivity(it) }
+                        finish()
                     }
                 }
             }
