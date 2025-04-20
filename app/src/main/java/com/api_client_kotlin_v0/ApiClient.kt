@@ -3,17 +3,22 @@ package com.api_client_kotlin_v0
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.api_client_kotlin_v0.models.LoginRequest
+import com.api_client_kotlin_v0.models.RegisterRequest
 import com.api_client_kotlin_v0.models.Ticket
+import com.api_client_kotlin_v0.models.TicketRequest
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 object ApiClient {
     private val client = OkHttpClient()
-    private val gson = Gson()
+    private val json = Json { ignoreUnknownKeys = true }
     private const val BASE_URL = "http://10.0.2.2:5000"
 
     // Регистрация
@@ -23,14 +28,12 @@ object ApiClient {
         email: String,
         password: String
     ): Boolean {
-        val json = gson.toJson(
-            mapOf(
-                "username" to username,
-                "email" to email,
-                "password" to password
-            )
-        )
-        val requestBody = json.toRequestBody("application/json".toMediaType())
+        val payload = RegisterRequest(username, email, password)
+
+        var requestBody = json
+            .encodeToString(payload)
+            .toRequestBody("application/json".toMediaType())
+
         val request = Request.Builder()
             .url("$BASE_URL/auth/register")
             .post(requestBody)
@@ -61,8 +64,10 @@ object ApiClient {
 
     // Вход
     suspend fun login(context: Context, email: String, password: String): String {
-        val json = gson.toJson(mapOf("email" to email, "password" to password))
-        val requestBody = json.toRequestBody("application/json".toMediaType())
+        val payload = LoginRequest(email, password)
+        val requestBody = json
+            .encodeToString(payload)
+            .toRequestBody("application/json".toMediaType())
         val request = Request.Builder()
             .url("$BASE_URL/auth/login")
             .post(requestBody)
@@ -95,8 +100,7 @@ object ApiClient {
 
     // Получение билетов с проверкой статуса и уведомлением об ошибке
     suspend fun getTickets(context: Context): List<Ticket>? {
-        val sessionManager = SessionManager(context)
-        val token = sessionManager.getAccessToken() ?: return null
+        val token = SessionManager(context).getAccessToken() ?: return null
 
         val request = Request.Builder()
             .url("$BASE_URL/eventure")
@@ -113,9 +117,8 @@ object ApiClient {
                     }
                     return@withContext null
                 }
-                response.body?.string()?.let {
-                    return@withContext gson.fromJson(it, Array<Ticket>::class.java).toList()
-                }
+                val raw = response.body?.string().orEmpty()
+                json.decodeFromString<List<Ticket>>(raw)
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
@@ -136,20 +139,12 @@ object ApiClient {
         price: Double
     ): String {
 
-        val sessionManager = SessionManager(context)
-        val token = sessionManager.getAccessToken() ?: ""
+        val token = SessionManager(context).getAccessToken().orEmpty()
+        val payload = TicketRequest(name, location, date, freeSeats, price)
+        val requestBody = json
+            .encodeToString(payload)
+            .toRequestBody("application/json".toMediaType())
 
-        val ticketRequest = mapOf(
-            "name" to name,
-            "location" to location,
-            "date" to date,
-            "freeSeats" to freeSeats,
-            "price" to price
-        )
-        val json = gson.toJson(ticketRequest)
-        val requestBody = json.toRequestBody("application/json".toMediaType())
-
-        // Собираем запрос
         val requestBuilder = Request.Builder()
             .url("$BASE_URL/eventure")
             .post(requestBody)
@@ -159,7 +154,6 @@ object ApiClient {
         }
 
         val request = requestBuilder.build()
-
         return withContext(Dispatchers.IO) {
             try {
                 val response = client.newCall(request).execute()
@@ -198,16 +192,10 @@ object ApiClient {
         price: Double
     ): String {
         val token = SessionManager(context).getAccessToken() ?: return "Токен не найден"
-
-        val ticketRequest = mapOf(
-            "name" to name,
-            "location" to location,
-            "date" to date,
-            "freeSeats" to freeSeats,
-            "price" to price
-        )
-        val json = gson.toJson(ticketRequest)
-        val requestBody = json.toRequestBody("application/json".toMediaType())
+        val payload = TicketRequest(name, location, date, freeSeats, price)
+        val requestBody = json
+            .encodeToString(payload)
+            .toRequestBody("application/json".toMediaType())
 
         val request = Request.Builder()
             .url("$BASE_URL/eventure/$id")
