@@ -9,8 +9,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.api_client_kotlin_v0.ApiClient
+import com.api_client_kotlin_v0.ApiClientImpl
 import com.api_client_kotlin_v0.R
+import com.api_client_kotlin_v0.SessionManager
 import com.api_client_kotlin_v0.ui.adapters.TicketAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class TicketsFragment : Fragment() {
-
+    private lateinit var apiClient: ApiClientImpl
     private lateinit var rvTickets: RecyclerView
     private lateinit var adapter: TicketAdapter
 
@@ -34,7 +35,7 @@ class TicketsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_tickets, container, false)
-
+        apiClient = ApiClientImpl(SessionManager(requireContext()), requireContext())
         rvTickets = view.findViewById(R.id.rvTickets)
         tvTicketCount = view.findViewById(R.id.tvTicketCount)
         tvLastUpdated = view.findViewById(R.id.tvLastUpdated)
@@ -56,7 +57,7 @@ class TicketsFragment : Fragment() {
 
     private fun loadTickets() {
         CoroutineScope(Dispatchers.IO).launch {
-            val tickets = ApiClient.getTickets(requireContext()) // запрос к API
+            val tickets = apiClient.getTickets() // запрос к API
             withContext(Dispatchers.Main) {
                 tickets?.let {
                     adapter.submitList(it)

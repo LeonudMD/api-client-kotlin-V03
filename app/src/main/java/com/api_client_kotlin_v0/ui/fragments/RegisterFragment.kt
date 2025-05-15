@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.api_client_kotlin_v0.ApiClient
+import com.api_client_kotlin_v0.ApiClientImpl
 import com.api_client_kotlin_v0.MainActivity
 import com.api_client_kotlin_v0.R
+import com.api_client_kotlin_v0.SessionManager
+import com.api_client_kotlin_v0.models.RegisterRequest
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class RegisterFragment : Fragment() {
-
+    private lateinit var apiClient: ApiClientImpl
     private lateinit var editUsername: EditText
     private lateinit var editEmail: EditText
     private lateinit var editPassword: EditText
@@ -27,6 +29,7 @@ class RegisterFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_register, container, false)
+        apiClient = ApiClientImpl(SessionManager(requireContext()), requireContext())
         editUsername = view.findViewById(R.id.editUsername)
         editEmail = view.findViewById(R.id.editEmail)
         editPassword = view.findViewById(R.id.editPassword)
@@ -41,7 +44,7 @@ class RegisterFragment : Fragment() {
 
             if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val success = ApiClient.register(requireContext(), username, email, password)
+                    val success = apiClient.register(RegisterRequest(username, email, password))
                     withContext(Dispatchers.Main) {
                         if (success) {
                             Toast.makeText(context, "Регистрация успешна!", Toast.LENGTH_SHORT).show()

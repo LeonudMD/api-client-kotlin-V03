@@ -10,10 +10,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.api_client_kotlin_v0.ApiClient
+import com.api_client_kotlin_v0.ApiClientImpl
 import com.api_client_kotlin_v0.MainActivity
 import com.api_client_kotlin_v0.R
 import com.api_client_kotlin_v0.SessionManager
+import com.api_client_kotlin_v0.models.LoginRequest
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ import org.json.JSONObject
 
 class LoginFragment : Fragment() {
 
+    private lateinit var apiClient: ApiClientImpl
     private lateinit var editEmail: EditText
     private lateinit var editPassword: EditText
     private lateinit var btnLogin: MaterialButton
@@ -30,6 +32,11 @@ class LoginFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
+        // Инициализируем наш клиент
+        apiClient = ApiClientImpl(
+            SessionManager(requireContext()),
+            requireContext()
+        )
         editEmail = view.findViewById(R.id.editEmail)
         editPassword = view.findViewById(R.id.editPassword)
         btnLogin = view.findViewById(R.id.btnLoginSubmit)
@@ -41,7 +48,9 @@ class LoginFragment : Fragment() {
             val password = editPassword.text.toString().trim()
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val response = ApiClient.login(requireContext(), email, password)
+                    val response = apiClient.login(
+                        LoginRequest(email, password)
+                    )
                     Log.d("LOGIN_DEBUG", "Сервер вернул: $response")
                     withContext(Dispatchers.Main) {
                         try {
