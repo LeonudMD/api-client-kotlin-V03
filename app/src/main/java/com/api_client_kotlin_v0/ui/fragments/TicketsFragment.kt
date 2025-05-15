@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.api_client_kotlin_v0.ApiClient
 import com.api_client_kotlin_v0.R
-import com.api_client_kotlin_v0.models.Ticket
 import com.api_client_kotlin_v0.ui.adapters.TicketAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +41,7 @@ class TicketsFragment : Fragment() {
         btnRefresh = view.findViewById(R.id.btnRefresh)
 
         rvTickets.layoutManager = LinearLayoutManager(context)
-        adapter = TicketAdapter(emptyList())
+        adapter = TicketAdapter()
         rvTickets.adapter = adapter
 
         loadTickets()
@@ -60,7 +59,7 @@ class TicketsFragment : Fragment() {
             val tickets = ApiClient.getTickets(requireContext()) // запрос к API
             withContext(Dispatchers.Main) {
                 tickets?.let {
-                    adapter.updateData(it)
+                    adapter.submitList(it)
                     tvTicketCount.text = "Количество билетов: ${it.size}"
                     tvLastUpdated.text = "Последнее обновление: ${getCurrentTime()}"
                 }

@@ -4,38 +4,42 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.api_client_kotlin_v0.R
 import com.api_client_kotlin_v0.models.Ticket
 
-class TicketAdapter(private var tickets: List<Ticket>) : RecyclerView.Adapter<TicketAdapter.TicketViewHolder>() {
+class TicketAdapter
+    : ListAdapter<Ticket, TicketAdapter.TicketViewHolder>(DIFF_CALLBACK) {
 
-    class TicketViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvName: TextView = view.findViewById(R.id.tvName)
-        val tvLocation: TextView = view.findViewById(R.id.tvLocation)
-        val tvDate: TextView = view.findViewById(R.id.tvDate)
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Ticket>() {
+            override fun areItemsTheSame(old: Ticket, new: Ticket) = old.id == new.id
+            override fun areContentsTheSame(old: Ticket, new: Ticket) = old == new
+        }
+    }
+
+    inner class TicketViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvName: TextView      = view.findViewById(R.id.tvName)
+        val tvLocation: TextView  = view.findViewById(R.id.tvLocation)
+        val tvDate: TextView      = view.findViewById(R.id.tvDate)
         val tvFreeSeats: TextView = view.findViewById(R.id.tvFreeSeats)
-        val tvPrice: TextView = view.findViewById(R.id.tvPrice)
+        val tvPrice: TextView     = view.findViewById(R.id.tvPrice)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TicketViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_ticket, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_ticket, parent, false)
         return TicketViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: TicketViewHolder, position: Int) {
-        val ticket = tickets[position]
-        holder.tvName.text = ticket.name
-        holder.tvLocation.text = "Место: ${ticket.location}"
-        holder.tvDate.text = "Дата: ${ticket.date}"
+        val ticket = getItem(position)
+        holder.tvName.text      = ticket.name
+        holder.tvLocation.text  = "Место: ${ticket.location}"
+        holder.tvDate.text      = "Дата: ${ticket.date}"
         holder.tvFreeSeats.text = "Свободные места: ${ticket.freeSeats}"
-        holder.tvPrice.text = "Цена: ${ticket.price}"
-    }
-
-    override fun getItemCount(): Int = tickets.size
-
-    fun updateData(newTickets: List<Ticket>) {
-        tickets = newTickets
-        notifyDataSetChanged()
+        holder.tvPrice.text     = "Цена: ${ticket.price}"
     }
 }
