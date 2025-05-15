@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var viewPager: ViewPager2
     private lateinit var bottomNavigation: BottomNavigationView
 
@@ -19,31 +20,35 @@ class MainActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.viewPager)
         bottomNavigation = findViewById(R.id.bottomNavigation)
 
+        // Настраиваем ViewPager
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_get -> viewPager.currentItem = 0
-                R.id.nav_post -> viewPager.currentItem = 1
-                R.id.nav_put -> viewPager.currentItem = 2
+                R.id.nav_get    -> viewPager.currentItem = 0
+                R.id.nav_post   -> viewPager.currentItem = 1
+                R.id.nav_put    -> viewPager.currentItem = 2
                 R.id.nav_delete -> viewPager.currentItem = 3
                 R.id.nav_logout -> {
-                    // создаём экземпляр ApiClientImpl
+                    // Инициализируем ApiClientImpl
                     val apiClient = ApiClientImpl(
-                        SessionManager(this@MainActivity),
-                        this@MainActivity
+                        SessionManager(this@MainActivity)
                     )
-                    // запускаем корутину для logout
+                    // Выполняем logout через корутину
                     lifecycleScope.launch {
-                        try {
-                            apiClient.logout()
-                        } catch (_: Exception) {
-                            // игнорируем ошибки при logout
+                        when (val result = apiClient.logout()) {
+                            is ApiResult.Success -> {
+                                // успешно разлогинились на сервере
+                            }
+                            is ApiResult.Error -> {
+                                // можно залогировать ошибку или показать Snackbar
+                                // val msg = result.exception?.message ?: "Код ${result.code}"
+                            }
                         }
-                        // чистим сохранённые токены
+                        // Очищаем локальные токены
                         SessionManager(this@MainActivity).clearTokens()
-                        // переходим на экран авторизации
+                        // Переходим на экран авторизации
                         Intent(this@MainActivity, AuthActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         }.also { startActivity(it) }
@@ -54,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        // Синхронизируем BottomNavigation с перелистыванием
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 if (position in 0..3) {
