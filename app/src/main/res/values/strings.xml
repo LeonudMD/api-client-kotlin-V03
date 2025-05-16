@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">API Client Kotlin</string>
+    <string name="ticket_count">Количество билетов: %1$d</string>
+    <string name="last_updated">Последнее обновление: %1$s</string>
+
+    <string name="initial_ticket_count">Количество билетов: 0</string>
+    <string name="initial_last_updated">Последнее обновление: -</string>
+    <string name="refresh">Обновить</string>
+    <string name="fab_add_ticket">Добавить билет</string>
+
+    <string name="location_format">Место: %1$s</string>
+    <string name="date_format">Дата: %1$s</string>
+    <string name="free_seats_format">Свободные места: %1$d</string>
+    <string name="price_format">Цена: %1$.2f</string>
 </resources>

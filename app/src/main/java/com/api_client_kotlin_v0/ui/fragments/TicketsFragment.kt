@@ -1,6 +1,6 @@
-// app/src/main/java/com/api_client_kotlin_v0/ui/fragments/TicketsFragment.kt
 package com.api_client_kotlin_v0.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +17,8 @@ import com.api_client_kotlin_v0.ApiResult
 import com.api_client_kotlin_v0.R
 import com.api_client_kotlin_v0.SessionManager
 import com.api_client_kotlin_v0.ui.adapters.TicketAdapter
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +31,8 @@ class TicketsFragment : Fragment() {
     private lateinit var tvTicketCount: TextView
     private lateinit var tvLastUpdated: TextView
     private lateinit var btnRefresh: Button
+    private lateinit var fabAdd: FloatingActionButton
+    private lateinit var bottomNav: BottomNavigationView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,44 +42,78 @@ class TicketsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_tickets, container, false)
 
         apiClient = ApiClientImpl(SessionManager(requireContext()))
+        bottomNav = requireActivity().findViewById(R.id.bottomNavigation)
 
         rvTickets = view.findViewById(R.id.rvTickets)
         tvTicketCount = view.findViewById(R.id.tvTicketCount)
         tvLastUpdated = view.findViewById(R.id.tvLastUpdated)
         btnRefresh = view.findViewById(R.id.btnRefresh)
+        fabAdd = view.findViewById(R.id.fabAddTicket)
 
         rvTickets.layoutManager = LinearLayoutManager(context)
-        adapter = TicketAdapter()
+        adapter = TicketAdapter(
+            onClick = { ticket ->
+                // короткий клик — перейти на редактирование
+                bottomNav.selectedItemId = R.id.nav_put
+            },
+            onLongClick = { ticket ->
+                // длинный клик — подтверждение удаления
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Удалить билет #${ticket.id}?")
+                    .setMessage("${ticket.name}, ${ticket.date}")
+                    .setNegativeButton("Отмена", null)
+                    .setPositiveButton("Удалить") { _, _ ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            when (val r = apiClient.deleteTicket(ticket.id)) {
+                                is ApiResult.Success -> {
+                                    Toast.makeText(context, "Удалено", Toast.LENGTH_SHORT).show()
+                                    loadTickets()
+                                }
+                                is ApiResult.Error -> {
+                                    val msg = r.exception?.message ?: "Код ${r.code}"
+                                    Toast.makeText(context, "Ошибка удаления: $msg", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    }
+                    .show()
+            }
+        )
         rvTickets.adapter = adapter
 
-        // Загрузка сразу
+        // Первичная загрузка и обновление по кнопке
         loadTickets()
-
-        // Кнопка «Обновить»
         btnRefresh.setOnClickListener { loadTickets() }
+
+        fabAdd.setOnClickListener {
+            bottomNav.selectedItemId = R.id.nav_post
+        }
 
         return view
     }
 
     private fun loadTickets() {
         viewLifecycleOwner.lifecycleScope.launch {
-            when (val result = apiClient.getTickets()) {
+            when (val r = apiClient.getTickets()) {
                 is ApiResult.Success -> {
-                    val list = result.data
-                    adapter.submitList(list)
-                    tvTicketCount.text = "Количество билетов: ${list.size}"
-                    tvLastUpdated.text = "Последнее обновление: ${getCurrentTime()}"
+                    adapter.submitList(r.data)
+                    tvTicketCount.text = getString(
+                             R.string.ticket_count,
+                             r.data.size
+                    )
+                     tvLastUpdated.text = getString(
+                             R.string.last_updated,
+                             getCurrentTime()
+                     )
                 }
                 is ApiResult.Error -> {
-                    val msg = result.exception?.message ?: "Код ${result.code}"
-                    Toast.makeText(context, "Ошибка получения билетов: $msg", Toast.LENGTH_LONG).show()
+                    val msg = r.exception?.message ?: "Код ${r.code}"
+                    Toast.makeText(context, "Ошибка получения: $msg", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-    private fun getCurrentTime(): String {
-        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-        return sdf.format(Date())
-    }
+    private fun getCurrentTime(): String =
+        SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())
 }

@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.api_client_kotlin_v0.R
 import com.api_client_kotlin_v0.models.Ticket
 
-class TicketAdapter
-    : ListAdapter<Ticket, TicketAdapter.TicketViewHolder>(DIFF_CALLBACK) {
+class TicketAdapter(
+    private val onClick: (Ticket) -> Unit,
+    private val onLongClick: (Ticket) -> Unit
+) : ListAdapter<Ticket, TicketAdapter.TicketViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Ticket>() {
@@ -21,11 +23,27 @@ class TicketAdapter
     }
 
     inner class TicketViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvName: TextView      = view.findViewById(R.id.tvName)
-        val tvLocation: TextView  = view.findViewById(R.id.tvLocation)
-        val tvDate: TextView      = view.findViewById(R.id.tvDate)
-        val tvFreeSeats: TextView = view.findViewById(R.id.tvFreeSeats)
-        val tvPrice: TextView     = view.findViewById(R.id.tvPrice)
+        private val tvName: TextView      = view.findViewById(R.id.tvName)
+        private val tvLocation: TextView  = view.findViewById(R.id.tvLocation)
+        private val tvDate: TextView      = view.findViewById(R.id.tvDate)
+        private val tvFreeSeats: TextView = view.findViewById(R.id.tvFreeSeats)
+        private val tvPrice: TextView     = view.findViewById(R.id.tvPrice)
+
+        fun bind(ticket: Ticket) {
+            tvName.text = ticket.name
+            val ctx = itemView.context
+            tvLocation.text  = ctx.getString(R.string.location_format, ticket.location)
+            tvDate.text      = ctx.getString(R.string.date_format, ticket.date)
+            tvFreeSeats.text = ctx.getString(R.string.free_seats_format, ticket.freeSeats)
+            tvPrice.text     = ctx.getString(R.string.price_format, ticket.price)
+
+
+            itemView.setOnClickListener    { onClick(ticket) }
+            itemView.setOnLongClickListener {
+                onLongClick(ticket)
+                true
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TicketViewHolder {
@@ -35,11 +53,6 @@ class TicketAdapter
     }
 
     override fun onBindViewHolder(holder: TicketViewHolder, position: Int) {
-        val ticket = getItem(position)
-        holder.tvName.text      = ticket.name
-        holder.tvLocation.text  = "Место: ${ticket.location}"
-        holder.tvDate.text      = "Дата: ${ticket.date}"
-        holder.tvFreeSeats.text = "Свободные места: ${ticket.freeSeats}"
-        holder.tvPrice.text     = "Цена: ${ticket.price}"
+        holder.bind(getItem(position))
     }
 }
