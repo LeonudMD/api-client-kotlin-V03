@@ -1,4 +1,3 @@
-// app/src/main/java/com/api_client_kotlin_v0/ui/fragments/TicketDeleteFragment.kt
 package com.api_client_kotlin_v0.ui.fragments
 
 import android.os.Bundle
